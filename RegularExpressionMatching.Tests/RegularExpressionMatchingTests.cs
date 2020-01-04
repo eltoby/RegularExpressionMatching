@@ -20,6 +20,7 @@
         [DataRow("bbbba", ".*a*a", true)]
         [DataRow("ab", ".*..", true)]
         [DataRow("abbbcd", "ab*bbbcd", true)]
+        [DataRow("abcdede", "ab.*de", true)]
         public void Examples(string s, string p, bool expected)
         {
             var sut = new Solution();
