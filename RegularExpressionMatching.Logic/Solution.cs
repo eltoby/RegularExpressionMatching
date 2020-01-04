@@ -13,6 +13,21 @@
             {
                 var expected = pattern.Pop();
 
+                if (expected == '*')
+                {
+                    expected = pattern.Pop();
+
+                    var repeated = expected;
+
+                    while (repeated == expected && input.Count > 0)
+                        repeated = input.Pop();
+
+                    if (input.Count == 0)
+                        continue;
+                    else if (repeated != '0')
+                        input.Push(repeated);
+                }
+
                 if (input.Count == 0)
                     return false;
 

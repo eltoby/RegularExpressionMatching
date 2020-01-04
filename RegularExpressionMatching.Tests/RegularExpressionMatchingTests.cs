@@ -8,6 +8,7 @@
     {
         [DataTestMethod]
         [DataRow("aa","a", false)]
+        [DataRow("aa", "a*", true)]
         public void Examples(string s, string p, bool expected)
         {
             var sut = new Solution();
