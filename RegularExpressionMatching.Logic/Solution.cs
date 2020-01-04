@@ -6,7 +6,7 @@
     {
         public bool IsMatch(string s, string p)
         {
-            var pattern = new Queue<char>(p);
+            var pattern = this.SimplifyPattern(new Queue<char>(p));
             var input = new Queue<char>(s);
 
             var lastMultipleDequeued = '0';
@@ -64,12 +64,51 @@
             return true;
         }
 
-        private bool Valid(char actual, char expected)
+        public Queue<char> SimplifyPattern(Queue<char> p)
         {
-            if (expected == '.')
-                return true;
+            var result = new Queue<char>(p.Count);
+            var initial = new Queue<char>(p);
 
-            return expected == actual;
+            var simplified = false;
+            while (initial.Count > 0)
+            {
+                var current = initial.Dequeue();
+
+                if (initial.Count == 0)
+                {
+                    result.Enqueue(current);
+                    break;
+                }
+
+                var next = initial.Peek();
+                result.Enqueue(current);
+
+                if (next == '*')
+                {
+                    initial.Dequeue();
+
+                    if (initial.Count > 0 && initial.Peek() == current)
+                    {
+                        result.Enqueue(initial.Dequeue());
+                        simplified = true;
+                    }
+
+                    result.Enqueue(next);
+                }
+            }
+
+                if (simplified)
+                    return this.SimplifyPattern(result);
+                else
+                    return result;
+            }
+
+            private bool Valid(char actual, char expected)
+            {
+                if (expected == '.')
+                    return true;
+
+                return expected == actual;
+            }
         }
     }
-}
