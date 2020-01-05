@@ -21,25 +21,38 @@
         [DataRow("ab", ".*..", true)]
         [DataRow("abbbcd", "ab*bbbcd", true)]
         [DataRow("abcdede", "ab.*de", true)]
+        [DataRow("aaaa", "aaa", false)]
+        [DataRow("aaa", "aaaa", false)]
+        [DataRow("a", ".*..a", false)]
+        [DataRow("", ".*", true)]
+        [DataRow("aaaaaaaaaaaaab", "a*a*a*a*a*a*a*a*a*a*a*a*b", true)]
+        [DataRow("aabcbcbcaccbcaabc", ".*a*aa*.*b*.c*.*a*", true)]
+        [DataRow("baabbbaccbccacacc", "c*..b*a*a.*a..*c", true)]
+        [DataRow("cbaacacaaccbaabcb","c*b*b*.*ac*.*bc*a*", true)]
         public void Examples(string s, string p, bool expected)
         {
             var sut = new Solution();
             var result = sut.IsMatch(s, p);
             Assert.AreEqual(expected, result);
         }
-
-        [TestMethod]
-        public void Simplify()
+        
+        [DataTestMethod]
+        [DataRow("ab*bbbcd", "abbbb*cd")]
+        [DataRow("a*a*a*a*a*a*a*a*a*a*a*a*b", "a*b")]
+        [DataRow(".*a*", ".*")]
+        [DataRow(".*c", ".*c")]
+        [DataRow("a*a", "aa*")]
+        [DataRow("c*b*b*.*ac*.*bc*a*", ".*a.*bc*a*")]
+        public void Simplify(string p, string expected)
         {
             var sut = new Solution();
-            var q = new Queue<char>("ab*bbbcd");
-            var result = sut.SimplifyPattern(q);
+            var result = sut.SimplifyPattern(p);
             var resultString = "";
 
             while (result.Count > 0)
                 resultString += result.Dequeue();
 
-            Assert.AreEqual("abbbb*cd", resultString);
+            Assert.AreEqual(expected, resultString);
         }
     }
 }

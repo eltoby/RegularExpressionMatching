@@ -1,13 +1,66 @@
 ﻿namespace RegularExpressionMatching.Logic
 {
     using System.Collections.Generic;
+    using System.Linq;
 
     public class Solution
     {
         public bool IsMatch(string s, string p)
         {
-            var pattern = this.SimplifyPattern(new Queue<char>(p));
-            var input = new Queue<char>(s);
+            var simplePattern = this.SimplifyPattern(p);
+
+            var inputS = new Stack<char>(s);
+            var patternS = new Stack<char>(simplePattern.ToArray());
+
+            while (patternS.Count > 0)
+            {
+                if (patternS.Peek() == '*')
+                    break;
+
+                if (inputS.Count == 0)
+                    return false;
+
+                var expected = patternS.Pop();
+
+                var actual = inputS.Pop();
+
+                if (!this.Valid(actual, expected))
+                    return false;
+            }
+
+            var pattern = patternS.ToList();
+            pattern.Reverse();
+            var remaining = inputS.ToList();
+            remaining.Reverse();
+            var input = new Queue<char>(remaining);
+
+            while (pattern.Count > 0)
+            {
+                if (pattern.Count > 1)
+                {
+                    var next = pattern[1];
+
+                    if (next == '*')
+                        break;
+                }
+
+                if (input.Count == 0)
+                    return false;
+
+                var expected = pattern[0];
+
+                var actual = input.Dequeue();
+                pattern.RemoveAt(0);
+
+                if (!this.Valid(actual, expected))
+                    return false;
+            }
+
+            return this.IsMatch(input, new Queue<char>(pattern));
+        }
+
+        public bool IsMatch(Queue<char> input, Queue<char> pattern)
+        {
 
             var lastMultipleDequeued = '0';
 
@@ -32,12 +85,6 @@
                             return true;
 
                         var until = pattern.Peek();
-
-                        if (pattern.Count > 1 && pattern.ToArray()[1] == '*')
-                        {
-                            pattern.Dequeue();
-                            until = pattern.Dequeue();
-                        }
 
                         while (input.Count > 0 && !this.Valid(input.Peek(), until))
                             lastMultipleDequeued = input.Dequeue();
@@ -64,51 +111,94 @@
             return true;
         }
 
-        public Queue<char> SimplifyPattern(Queue<char> p)
+        public Queue<char> SimplifyPattern(string p)
         {
-            var result = new Queue<char>(p.Count);
-            var initial = new Queue<char>(p);
-
+            var result = new Queue<char>();
             var simplified = false;
-            while (initial.Count > 0)
-            {
-                var current = initial.Dequeue();
 
-                if (initial.Count == 0)
+            for (var i = 0; i < p.Length; i++)
+            {
+                var n = p[i];
+
+                if (p.Length - 1 == i)
                 {
-                    result.Enqueue(current);
+                    result.Enqueue(n);
                     break;
                 }
 
-                var next = initial.Peek();
-                result.Enqueue(current);
+                var n1 = p[i + 1];
 
-                if (next == '*')
+                if (p.Length - 2 == i)
                 {
-                    initial.Dequeue();
+                    result.Enqueue(n);
+                    result.Enqueue(n1);
+                    break;
+                }
 
-                    if (initial.Count > 0 && initial.Peek() == current)
+                if (n1 != '*')
+                {
+                    result.Enqueue(n);
+                    continue;
+                }
+
+                var n2 = p[i + 2];
+
+                if (n == n2)
+                {
+                    if ((p.Length - 3 == i || p[i + 3] != '*'))
                     {
-                        result.Enqueue(initial.Dequeue());
+                        result.Enqueue(n);
+                        result.Enqueue(n2);
+                        result.Enqueue(n1);
                         simplified = true;
+                        i += 2;
+                        continue;
                     }
-
-                    result.Enqueue(next);
+                    else
+                    {
+                        result.Enqueue(n);
+                        result.Enqueue(n1);
+                        i += 3;
+                        simplified = true;
+                        continue;
+                    }
+                }
+                else if ((n == '.' || n2 == '.') && i + 3 < p.Length && p[i + 3] == '*')
+                {
+                    result.Enqueue('.');
+                    result.Enqueue('*');
+                    i += 3;
+                    simplified = true;
+                    continue;
+                }
+                else
+                {
+                    result.Enqueue(n);
+                    result.Enqueue(n1);
+                    i ++;
+                    continue;
                 }
             }
 
-                if (simplified)
-                    return this.SimplifyPattern(result);
-                else
-                    return result;
-            }
-
-            private bool Valid(char actual, char expected)
+            if (simplified)
             {
-                if (expected == '.')
-                    return true;
+                var resultString = "";
 
-                return expected == actual;
+                while (result.Count > 0)
+                    resultString += result.Dequeue();
+
+                return this.SimplifyPattern(resultString);
             }
+            else
+                return result;
+        }
+
+        private bool Valid(char actual, char expected)
+        {
+            if (expected == '.')
+                return true;
+
+            return expected == actual;
         }
     }
+}
