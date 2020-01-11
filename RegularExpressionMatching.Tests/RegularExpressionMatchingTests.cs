@@ -36,23 +36,23 @@
             Assert.AreEqual(expected, result);
         }
         
-        [DataTestMethod]
-        [DataRow("ab*bbbcd", "abbbb*cd")]
-        [DataRow("a*a*a*a*a*a*a*a*a*a*a*a*b", "a*b")]
-        [DataRow(".*a*", ".*")]
-        [DataRow(".*c", ".*c")]
-        [DataRow("a*a", "aa*")]
-        [DataRow("c*b*b*.*ac*.*bc*a*", ".*a.*bc*a*")]
-        public void Simplify(string p, string expected)
-        {
-            var sut = new Solution();
-            var result = sut.SimplifyPattern(p);
-            var resultString = "";
+        //[DataTestMethod]
+        //[DataRow("ab*bbbcd", "abbbb*cd")]
+        //[DataRow("a*a*a*a*a*a*a*a*a*a*a*a*b", "a*b")]
+        //[DataRow(".*a*", ".*")]
+        //[DataRow(".*c", ".*c")]
+        //[DataRow("a*a", "aa*")]
+        //[DataRow("c*b*b*.*ac*.*bc*a*", ".*a.*bc*a*")]
+        //public void Simplify(string p, string expected)
+        //{
+        //    var sut = new Solution();
+        //    var result = sut.SimplifyPattern(p);
+        //    var resultString = "";
 
-            while (result.Count > 0)
-                resultString += result.Dequeue();
+        //    while (result.Count > 0)
+        //        resultString += result.Dequeue();
 
-            Assert.AreEqual(expected, resultString);
-        }
+        //    Assert.AreEqual(expected, resultString);
+        //}
     }
 }
